@@ -65,7 +65,7 @@ test.describe('Login', () => {
     await expect(page.locator('button', { hasText: 'Add new Bot' })).toBeVisible();
     await expect(page.locator('button', { hasText: 'Login' })).not.toBeVisible();
     // Test logout
-    await page.getByRole('button', { name: 'FT' }).click();
+    await page.getByRole('button', { name: 'W', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Logout' }).click();
     // Assert we're logged out again
     await expect(page.locator('button', { hasText: 'Login' })).toBeVisible();

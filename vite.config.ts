@@ -95,6 +95,16 @@ export default defineConfig({
         target: 'http://127.0.0.1:8080',
         changeOrigin: true,
       },
+      // Dev only, opt in: WICKFLEET_HUB=http://127.0.0.1:8090 reaches a local hub as an admin.
+      ...(process.env.WICKFLEET_HUB && {
+        '/hub': {
+          target: process.env.WICKFLEET_HUB,
+          headers: {
+            'X-Auth-Request-Preferred-Username': process.env.WICKFLEET_DEV_USER ?? 'dev',
+            'X-Auth-Request-Groups': process.env.WICKFLEET_DEV_GROUPS ?? 'trade_admins',
+          },
+        },
+      }),
     },
     host: '127.0.0.1',
     port: 3000,

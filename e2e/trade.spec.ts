@@ -119,7 +119,7 @@ test.describe('Trade', () => {
 
     const multiPanebb = await multiPane.boundingBox();
 
-    await page.getByRole('button', { name: 'FT' }).click();
+    await page.getByRole('button', { name: 'W', exact: true }).click();
     await page.getByText('Unlock Layout').click();
 
     const chartHeader = await page.locator('.drag-header:has-text("Chart")');

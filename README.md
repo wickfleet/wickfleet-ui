@@ -1,113 +1,69 @@
-# FreqUI
+# Wickfleet UI
 
-[![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://vscode.dev/github/freqtrade/frequi)
-[![FreqUI CI](https://github.com/freqtrade/frequi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/freqtrade/frequi/actions/)
+The browser UI for [Wickfleet](https://github.com/wickfleet/wickfleet), one web
+front end for a fleet of [Freqtrade](https://www.freqtrade.io) bots. It adds a
+fleet overview, replays, a block-based strategy editor and bot management on
+top of FreqUI. The bots come from the Wickfleet hub, which logs the browser in
+to each bot, so nobody types a bot API password.
 
-Freqtrade UI build with [Vue.js](https://vuejs.org/) and [primevue](https://primevue.org/).
+This is a fork of [FreqUI](https://github.com/freqtrade/frequi) by Matthias
+Voppichler and contributors, GPL-3.0. All credit for the trading views goes to
+them and to the [Freqtrade](https://github.com/freqtrade/freqtrade) project.
+Without a hub on the same origin the UI behaves like stock FreqUI.
 
-## Run this project
+| Page | Does |
+|---|---|
+| Fleet | totals per stake currency (dry and live apart), per-bot table, watchlist signals |
+| Replay | backtest a bot over a chosen range: summary with fees and buy-and-hold, trades |
+| Strategies | rules as Blockly blocks, settings form, live hub check with readback and generated code |
+| Bots | create, edit, delete. Each save is a commit to the hub's registry |
+| Everything else | FreqUI as upstream ships it |
 
-Using FreqUI, does require [freqtrade](https://github.com/freqtrade/freqtrade) to be setup and running.
-In newer versions (2021.2 and newer), freqUI is builtin to freqtrade, so manual setup of freqUI will no longer be necessary unless you want to modify freqUI.
-Instructions for this end-user setup can be found in the [freqtrade API documentation](https://www.freqtrade.io/en/stable/rest-api/).
+Fork details and the files each change lives in: [WICKFLEET.md](WICKFLEET.md).
 
-### Running a standalone version of FreqUI
+## Build
 
-Using Docker, you can also run a pre-built docker image of FreqUI.
+Needs Node and make. `make` lists the targets.
 
-```bash
-docker compose up -d
+| Command | Does |
+|---|---|
+| `make setup` | install dependencies from the lockfile |
+| `make lint` | eslint and the type check |
+| `make test` | unit tests |
+| `make build` | static UI into `dist/` |
+| `make image` | nginx image `wickfleet-ui` (needs Docker) |
+| `make e2e` | Playwright against a mocked hub API |
+
+Released images: `ghcr.io/wickfleet/wickfleet-ui:<version>` and `:latest`,
+linux/amd64 and linux/arm64.
+
+## Pairing with the hub
+
+The UI expects the hub on the same origin under `/hub`. The quick start in the
+[hub repository](https://github.com/wickfleet/wickfleet#quick-start) runs both
+behind Traefik with `make quickstart`. That is the easiest way to see it work.
+
+For UI development against a local hub (`make run` in the hub checkout):
+
+```sh
+WICKFLEET_HUB=http://127.0.0.1:8090 make run
 ```
 
-This will start a pre-built container with FreqUI running on port 3000 - which defaults to the latest version of freqUI.
-You can use `docker compose pull` to update to the latest version of the UI.
+The Vite dev server proxies `/hub` to that hub as an admin.
+`WICKFLEET_DEV_USER` and `WICKFLEET_DEV_GROUPS` override the identity.
 
-Please note: This is a standalone version of FreqUI, and will still require a correctly configured freqtrade bot.
-You'll need to correctly configure [CORS](https://www.freqtrade.io/en/stable/rest-api/#cors) in freqtrade to allow FreqUI to connect to the API.
+To run your own build in the quick start, build the image here and point the
+hub at it:
 
-## Developer project setup
-
-It will require [freqtrade](https://github.com/freqtrade/freqtrade) to be running on the same host with the API enabled under (`localhost:8080`). You can either use the webpack proxy (port can be changed in `vue.config.js`) - or connect directly to the API (recommended).
-
-You will also have to have CORS for freqtrade configured correctly based on the [freqtrade documentation](https://www.freqtrade.io/en/stable/rest-api/#cors).
-Most likely, the correct entry will be `http://localhost:3000` or `http://127.0.0.1:3000` - but the URL must match the URL you use to access FreqUI.
-Ports can vary, so check the URL you're using.
-
-### Project setup
-
-```
-pnpm install
+```sh
+docker build -t wickfleet-ui:local .
+WICKFLEET_UI_IMAGE=wickfleet-ui:local make quickstart
 ```
 
-### Compiles and hot-reloads for development
+## Licence
 
-```
-pnpm run dev
-```
+GPL-3.0, the same as upstream FreqUI. See [LICENSE](LICENSE). Blockly is
+Apache-2.0.
 
-### Compiles and minifies for production
-
-```
-pnpm run build
-```
-
-### Lints and fixes files
-
-```
-pnpm run lint
-```
-
-### Build and run docker version
-
-```
-docker-compose build
-docker-compose up -d
-
-# Access using http://localhost:3000/
-```
-
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
-
-## Project setup for docker (developing inside dev container) without vscode
-
-### Built dev docker image and run container(s) detached
-
-```
-cd .devcontainer
-docker-compose up -d
-```
-
-### Go inside web-service container and serve
-
-```
-docker-compose exec web /bin/bash
-```
-
-then
-
-```
-pnpm run dev
-```
-
-## Project setup for vscode and docker (developing inside dev container) on Linux
-
-The goal is to have a complete dev environment very quickly and isolated.
-
-### Install missing tools if needed
-
-Follow [getting started](https://code.visualstudio.com/docs/remote/containers#_getting-started) section.
-
-### Build your dev container
-
-View > Command palette > Enter: Remote-Containers rebuild container
-
-### Serve your local server
-
-```
-pnpm run dev
-```
-
-You now have useful vscode extensions, git support, your command history of the project.
+Not financial advice. Bots run as dry runs unless the hub is set up for real
+money on purpose.

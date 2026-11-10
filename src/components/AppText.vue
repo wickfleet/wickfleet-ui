@@ -1,5 +1,5 @@
 <template>
   <span class="text-xl text-nowrap font-bold">
-    Freqtrade<span class="text-primary font-bold">UI</span></span
+    Wick<span class="text-primary font-bold">fleet</span></span
   >
 </template>

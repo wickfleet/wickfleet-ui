@@ -25,9 +25,15 @@ const resetDynamicLayout = () => {
 
 <template>
   <UCard class="mx-auto mt-3 p-4 max-w-4xl">
-    <template #header><span class="text-2xl font-bold">FreqUI Settings</span></template>
+    <template #header><span class="text-2xl font-bold">Wickfleet Settings</span></template>
     <div class="flex flex-col gap-4 text-start dark:text-neutral-300">
       <p class="text-left">UI Version: {{ settingsStore.uiVersion }}</p>
+      <p class="text-left text-sm">
+        Based on
+        <a class="text-primary underline" href="https://github.com/freqtrade/frequi" target="_blank"
+          >FreqUI</a
+        >, GPL-3.0.
+      </p>
 
       <div class="border border-neutral-400 rounded-sm p-4 space-y-4">
         <h4 class="text-xl font-semibold">UI settings</h4>

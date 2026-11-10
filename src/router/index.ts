@@ -6,9 +6,14 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
+let hubTimer: ReturnType<typeof setInterval> | undefined;
+
+router.beforeEach(async (to) => {
   // Init bots here...
   initBots();
+  // Wickfleet: bots come from the hub; a new or removed bot shows up within a minute.
+  await syncHubBots();
+  hubTimer ??= setInterval(() => void syncHubBots(), 60_000);
   const botStore = useBotStore();
   if (!to.meta?.allowAnonymous && !botStore.hasBots) {
     // Forward to login if login is required

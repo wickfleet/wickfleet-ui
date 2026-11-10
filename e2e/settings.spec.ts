@@ -11,14 +11,14 @@ test.describe('Settings', () => {
       // page.waitForResponse('**/ShowConf'),
     ]);
     // await expect(page.locator('li', { hasText: 'Online' })).toBeInViewport();
-    await expect(page.locator('h1', { hasText: 'Welcome to the FreqtradeUI' })).toBeInViewport({
+    await expect(page.locator('h1', { hasText: 'Welcome to Wickfleet' })).toBeInViewport({
       timeout: 5000,
     });
-    await expect(page.getByRole('button', { name: 'FT' })).toBeVisible();
-    await page.getByRole('button', { name: 'FT' }).click();
+    await expect(page.getByRole('button', { name: 'W', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'W', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Settings' }).click();
 
-    await expect(page.getByText('FreqUI Settings')).toBeVisible();
+    await expect(page.getByText('Wickfleet Settings')).toBeVisible();
     await expect(page.url()).toBe('http://localhost:3000/settings');
 
     // Switch option in the settings.

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "TrendDaily",
+  "description": "Daily trend: long above SMA200 on a 20-day breakout, out below SMA50.",
+  "timeframe": "1d",
+  "stoploss": -0.20,
+  "indicators": [
+    {"id": "sma50", "kind": "sma", "source": "close", "period": 50},
+    {"id": "sma200", "kind": "sma", "source": "close", "period": 200},
+    {"id": "hi20", "kind": "highest", "source": "high", "period": 20, "shift": 1}
+  ],
+  "entry": {"all": [
+    {"left": "close", "op": ">", "right": "sma200"},
+    {"left": "close", "op": ">", "right": "hi20"}
+  ]},
+  "exit": {"any": [
+    {"left": "close", "op": "<", "right": "sma50"}
+  ]}
+}

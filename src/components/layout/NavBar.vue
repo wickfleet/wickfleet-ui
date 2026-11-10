@@ -56,7 +56,7 @@ const resetDynamicLayout = (): void => {
   }
 };
 const setTitle = () => {
-  let title = 'freqUI';
+  let title = 'Wickfleet';
   if (settingsStore.openTradesInTitle === OpenTradeVizOptions.asTitle) {
     title = `(${botStore.activeBot?.openTradeCount}) ${title}`;
   }
@@ -103,12 +103,59 @@ watch(
 // Navigation items array
 type NavItem = NavigationMenuItem & { visible?: boolean; mobileOnly?: boolean };
 
+const { hubAvailable } = useWickfleet();
+
 const navItems = computed<NavItem[]>(() => [
+  {
+    label: 'Fleet',
+    to: '/fleet',
+    visible: hubAvailable.value,
+    icon: 'i-mdi-chart-box-outline',
+  },
+  {
+    label: 'Bots',
+    to: '/bots',
+    visible: hubAvailable.value,
+    icon: 'i-mdi-robot-outline',
+  },
+  {
+    label: 'Strategies',
+    to: '/strategies',
+    visible: hubAvailable.value,
+    icon: 'i-mdi-puzzle-outline',
+  },
+  {
+    label: 'Replay',
+    to: '/replay',
+    visible: hubAvailable.value,
+    icon: 'i-mdi-history',
+  },
   {
     label: 'Trade',
     to: '/trade',
     visible: !botStore.canRunBacktest,
     icon: 'i-mdi-currency-usd',
+  },
+  {
+    label: 'History',
+    to: '/trade_history',
+    visible: !botStore.canRunBacktest,
+    mobileOnly: true,
+    icon: 'i-mdi-folder-lock',
+  },
+  {
+    label: 'Balance',
+    to: '/balance',
+    visible: !botStore.canRunBacktest,
+    mobileOnly: true,
+    icon: 'i-mdi-bank',
+  },
+  {
+    label: 'Pairlist',
+    to: '/pairlist',
+    visible: !botStore.canRunBacktest,
+    mobileOnly: true,
+    icon: 'i-mdi-format-list-group',
   },
   {
     label: 'Dashboard',
@@ -286,7 +333,7 @@ function editBotLogin(botId: string) {
             <UDropdownMenu :items="menuItems" size="lg">
               <UButton color="neutral" variant="ghost" size="sm" trailing-icon="mdi:chevron-down">
                 <div class="flex items-center">
-                  <UAvatar size="sm"> FT </UAvatar>
+                  <UAvatar size="sm"> W </UAvatar>
                 </div>
               </UButton>
             </UDropdownMenu>

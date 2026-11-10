@@ -9,8 +9,13 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+// Wickfleet CI shares the host network with a service on 3000.
+const port = process.env.E2E_PORT ?? '3000';
+
 export default defineConfig({
   testDir: './e2e',
+  // e2e/live runs against a deployed Wickfleet: playwright.live.config.ts.
+  testIgnore: 'live/**',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -24,7 +29,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3000',
+    baseURL: `http://localhost:${port}`,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -35,6 +40,11 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+    },
+    {
+      // Wickfleet CI: the browser bundled with Playwright, no Google Chrome needed.
+      name: 'chromium-bundled',
+      use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'msedge',
@@ -73,8 +83,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: !process.env.CI ? 'pnpm run dev' : 'pnpm run preview --port 3000',
-    url: 'http://localhost:3000',
+    command: !process.env.CI ? `pnpm run dev --port ${port}` : `pnpm run preview --port ${port}`,
+    url: `http://localhost:${port}`,
     reuseExistingServer: !process.env.CI,
   },
 });

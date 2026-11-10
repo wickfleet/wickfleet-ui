@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "FreqaiTrend",
+  "description": "1h, long only: enter on a predicted 24h mean move above 2.5% (fees are 1.6%).",
+  "timeframe": "1h",
+  "stoploss": -0.10,
+  "model": {"features": "freqai_example", "target": "mean_return"},
+  "startup_candles": 40,
+  "entry_guard": {"max_above_close": 0.0025},
+  "indicators": [],
+  "entry": {"all": [
+    {"left": "do_predict", "op": "==", "right": 1},
+    {"left": "prediction", "op": ">", "right": 0.025}
+  ]},
+  "exit": {"all": [
+    {"left": "do_predict", "op": "==", "right": 1},
+    {"left": "prediction", "op": "<", "right": 0}
+  ]}
+}
