@@ -150,7 +150,7 @@ async function startDownload() {
             <div class="flex flex-col gap-2">
               <div class="flex justify-between items-center">
                 <h4 class="text-start mb-0 font-bold text-lg">Time Selection</h4>
-                <BaseCheckbox v-model="timeSelection.useCustomTimerange" class="mb-0" switch>
+                <BaseCheckbox v-model="timeSelection.useCustomTimerange" class="mb-0">
                   Use custom timerange
                 </BaseCheckbox>
               </div>
@@ -214,9 +214,20 @@ async function startDownload() {
               class="mb-2 border dark:border-neutral-700 border-neutral-300 rounded-md p-2 text-start"
             >
               <UCollapsible v-model:open="exchange.customExchange">
-                <BaseCheckbox v-model="exchange.customExchange" class="mb-2">
-                  Custom Exchange
-                </BaseCheckbox>
+                <div class="flex flex-row gap-5 items-center mb-2">
+                  <BaseCheckbox v-model="exchange.customExchange"> Custom Exchange </BaseCheckbox>
+                  <span
+                    v-show="!exchange.customExchange"
+                    class="text-sm"
+                    title="Current exchange from the configuration"
+                  >
+                    Current Exchange:
+                    <span class="font-bold">
+                      {{ botStore.activeBot.botState.exchange }}
+                      {{ botStore.activeBot.botState.trading_mode }}
+                    </span>
+                  </span>
+                </div>
                 <template #content>
                   <ExchangeSelect
                     v-show="exchange.customExchange"
@@ -227,8 +238,8 @@ async function startDownload() {
             </div>
           </BaseCollapsible>
 
-          <div class="px-3">
-            <UButton variant="solid" icon="mdi:download" @click="startDownload"
+          <div class="px-3 flex justify-center">
+            <UButton variant="solid" icon="mdi:download" @click="startDownload" size="lg"
               >Start Download</UButton
             >
           </div>

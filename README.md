@@ -9,7 +9,8 @@ to each bot, so nobody types a bot API password.
 This is a fork of [FreqUI](https://github.com/freqtrade/frequi) by Matthias
 Voppichler and contributors, GPL-3.0. All credit for the trading views goes to
 them and to the [Freqtrade](https://github.com/freqtrade/freqtrade) project.
-Without a hub on the same origin the UI behaves like stock FreqUI.
+Without a hub on the same origin the UI behaves like stock FreqUI. Built with
+[Vue.js](https://vuejs.org/) and [Nuxt UI](https://ui.nuxt.com/), like upstream.
 
 | Page | Does |
 |---|---|

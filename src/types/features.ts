@@ -38,7 +38,9 @@ export type FeatureKey =
   | 'recursiveAnalysis'
   | 'lookaheadAnalysis'
   | 'backgroundJobDelete'
-  | 'timerangeWithTime';
+  | 'timerangeWithTime'
+  | 'strategyParametersModify'
+  | 'backtestPairHistory';
 
 export type BotFeatures = Record<FeatureKey, boolean>;
 
@@ -85,4 +87,9 @@ export const FEATURES: Record<FeatureKey, FeatureConfig> = {
   lookaheadAnalysis: { minVersion: 2.49, description: 'Lookahead analysis' },
   backgroundJobDelete: { minVersion: 2.49, description: 'Delete background jobs' },
   timerangeWithTime: { minVersion: 2.5, description: 'Timerange with hour/minute precision' },
+  strategyParametersModify: { minVersion: 2.51, description: 'Strategy parameter setting' },
+  backtestPairHistory: {
+    minVersion: 2.51,
+    description: 'Analyze pairs with the strategy stored in a backtest result',
+  },
 };

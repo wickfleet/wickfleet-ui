@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { MarginMode, TradingMode } from '@/types';
-import type { ExchangeSelection, Markets, MarketsPayload, PairHistoryPayload } from '@/types';
+import type {
+  ExchangeSelection,
+  Markets,
+  MarketsPayload,
+  PairHistoryPayload,
+  StrategyParameterValue,
+  StrategyResult,
+} from '@/types';
 
 const botStore = useBotStore();
 const chartStore = useChartConfigStore();
+const selectedStrategyDetails = ref<StrategyResult>();
 
 const finalTimeframe = computed<string>(() => {
   return botStore.activeBot.isWebserverMode
-    ? chartStore.selectedTimeframe || botStore.activeBot.strategy?.timeframe || ''
+    ? chartStore.selectedTimeframe ||
+        selectedStrategyDetails.value?.timeframe ||
+        botStore.activeBot.strategy?.timeframe ||
+        ''
     : botStore.activeBot.timeframe;
 });
 
@@ -38,6 +49,10 @@ onMounted(() => {
     botStore.activeBot.getWhitelist();
   }
 });
+const strategyParams = ref<Record<string, StrategyParameterValue>>({});
+const strategyParamsModified = computed(() =>
+  hasModifiedStrategyParams(selectedStrategyDetails.value, strategyParams.value),
+);
 
 function refreshOHLCV(pair: string, columns: string[]) {
   console.log('Refreshing OHLCV for pair:', pair, finalTimeframe.value, 'with columns:', columns);
@@ -55,6 +70,14 @@ function refreshOHLCV(pair: string, columns: string[]) {
       payload.exchange = exchange.value.selectedExchange.exchange;
       payload.trading_mode = exchange.value.selectedExchange.trade_mode.trading_mode;
       payload.margin_mode = exchange.value.selectedExchange.trade_mode.margin_mode;
+    }
+
+    const strategyParamsPayload = buildStrategyParamsPayload(
+      selectedStrategyDetails.value,
+      strategyParams.value,
+    );
+    if (strategyParamsPayload) {
+      payload.strategy_params = strategyParamsPayload;
     }
     botStore.activeBot.getPairHistory(payload);
   } else {
@@ -101,41 +124,40 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <!-- <div v-if="isWebserverMode" class="me-auto ms-3"> -->
-    <!-- Currently only available in Webserver mode -->
-    <!-- <b-form-checkbox v-model="historicView">HistoricData</b-form-checkbox> -->
-    <!-- </div> -->
+  <div class="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
     <div v-if="botStore.activeBot.isWebserverMode" class="md:mx-3 mt-2 px-1">
-      <UCard :ui="{ body: 'p-3 sm:p-3' }">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-xl font-bold">Settings</span>
+      <BaseCollapsible size="md" open title="Chart Settings" :unmount-on-hide="false">
+        <template #title>
+          <span class="text-lg font-bold">Chart Settings</span>
           <InfoBox
             hint="These settings only apply to the chart view and do not affect the bot's actual configuration or behavior."
           />
-        </div>
-        <div
-          class="mb-2 border dark:border-neutral-700 border-neutral-300 rounded-md p-2 text-start"
-        >
-          <UCollapsible v-model:open="exchange.customExchange">
-            <div class="flex flex-row gap-5 items-center">
-              <BaseCheckbox v-model="exchange.customExchange">Custom Exchange</BaseCheckbox>
-              <span v-show="!exchange.customExchange" class="text-sm">
-                Current Exchange:
-                {{ botStore.activeBot.botState.exchange }}
-                {{ botStore.activeBot.botState.trading_mode }}
-              </span>
+        </template>
+        <div class="grid grid-cols-3 md:grid-cols-5 gap-2 m-2">
+          <UFormField label="Exchange" class="col-span-2">
+            <div
+              class="mb-2 border dark:border-neutral-700 border-neutral-300 rounded-md p-1 text-start col-span-2"
+            >
+              <UCollapsible v-model:open="exchange.customExchange">
+                <div class="flex flex-row gap-5 items-center">
+                  <BaseCheckbox v-model="exchange.customExchange">Custom Exchange</BaseCheckbox>
+                  <span
+                    v-show="!exchange.customExchange"
+                    class="text-sm"
+                    title="Current exchange from the configuration"
+                  >
+                    Current Exchange:
+                    <span class="font-bold">
+                      {{ botStore.activeBot.botState.exchange }}
+                      {{ botStore.activeBot.botState.trading_mode }}
+                    </span>
+                  </span>
+                </div>
+                <template #content>
+                  <ExchangeSelect v-model="exchange.selectedExchange" class="mt-2" />
+                </template>
+              </UCollapsible>
             </div>
-            <template #content>
-              <ExchangeSelect v-model="exchange.selectedExchange" class="mt-2" />
-            </template>
-          </UCollapsible>
-          <Transition name="fade"> </Transition>
-        </div>
-        <div class="grid grid-cols-3 md:grid-cols-5 mx-1 gap-1 md:gap-2">
-          <div class="text-start md:me-1 col-span-2">
-            <span>Strategy</span>
-            <StrategySelect v-model="chartStore.strategy" class="mt-1 mb-1"></StrategySelect>
             <BaseCheckbox
               v-if="botStore.activeBot.botFeatures.chartLiveData"
               v-model="chartStore.useLiveData"
@@ -144,21 +166,59 @@ watch(
             >
               Use Live Data
             </BaseCheckbox>
-          </div>
+          </UFormField>
           <div class="flex flex-col text-start">
-            <span>Timeframe</span>
-            <TimeframeSelect v-model="chartStore.selectedTimeframe" class="mt-1" />
+            <UFormField label="Timeframe">
+              <TimeframeSelect v-model="chartStore.selectedTimeframe" class="w-full" />
+            </UFormField>
           </div>
           <TimeRangeSelect
             v-model="chartStore.timerange"
             :can-use-time="botStore.activeBot.botFeatures.timerangeWithTime"
             class="col-span-3 md:col-span-2"
           ></TimeRangeSelect>
+          <UFormField label="Strategy" class="col-span-3 md:col-span-2">
+            <StrategySelect
+              v-model="chartStore.strategy"
+              v-model:details="selectedStrategyDetails"
+              class=""
+            />
+          </UFormField>
+
+          <UFormField
+            v-if="
+              botStore.activeBot.botFeatures.strategyParametersModify && selectedStrategyDetails
+            "
+            label="Strategy params"
+            class="col-span-3 md:col-span-3"
+          >
+            <BaseCollapsible
+              v-if="selectedStrategyDetails?.params.length > 0"
+              size="md"
+              :unmount-on-hide="false"
+            >
+              <template #title>
+                Open to modify strategy parameters
+                <span v-if="strategyParamsModified" class="text-warning"> (modified) </span>
+              </template>
+              <p class="flex items-center gap-1 mx-3 mt-2 text-sm text-muted">
+                <UIcon name="i-mdi-information-outline" />
+                Explicitly reload the chart after changing parameters.
+              </p>
+              <StrategyParameters
+                :strategy="selectedStrategyDetails"
+                class="m-3 overflow-y-auto max-h-96 pr-1"
+                editable
+                v-model:parameters="strategyParams"
+              />
+            </BaseCollapsible>
+            <span v-else class="text-md font-bold">No strategy parameters available</span>
+          </UFormField>
         </div>
-      </UCard>
+      </BaseCollapsible>
     </div>
 
-    <div class="md:mx-2 mt-2 pb-1 h-full">
+    <div class="md:mx-2 mt-2 flex-1 min-h-0 min-w-0 pb-1 overflow-hidden">
       <CandleChartContainer
         :available-pairs="availablePairs"
         :historic-view="botStore.activeBot.isWebserverMode"

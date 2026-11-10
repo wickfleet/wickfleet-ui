@@ -1,3 +1,4 @@
+import type { StrategyParameterInputs } from './strategy';
 import type { ExchangeSelectPayload } from './types';
 
 export interface AvailablePairPayload {
@@ -31,6 +32,19 @@ export interface PairHistoryPayload extends ExchangeSelectPayload {
   freqaimodel?: string;
   columns?: string[];
   live_mode?: boolean;
+  strategy_params?: StrategyParameterInputs[];
+}
+
+export interface BacktestPairHistoryPayload {
+  /** Filename (without extension) of the backtest result */
+  filename: string;
+  strategy: string;
+  pair: string;
+  /** Timeframe of the backtest result - used for local caching only */
+  timeframe: string;
+  /** Defaults to the timerange the backtest ran on */
+  timerange?: string;
+  columns?: string[];
 }
 
 export interface _MarkArea {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { StrategyResult } from '@/types';
+
 withDefaults(
   defineProps<{
     showDetails?: boolean;
@@ -9,15 +11,39 @@ withDefaults(
 );
 
 const strategy = defineModel<string>();
+const strategyDetails = defineModel<StrategyResult | undefined>('details');
 
 const botStore = useBotStore();
 
-const strategyCode = computed((): string => botStore.activeBot.strategy?.code ?? '');
+const strategyCode = computed((): string => strategyDetails.value?.code ?? '');
 
-watch(strategy, (newStrategy, oldStrategy) => {
-  if (!newStrategy || newStrategy === oldStrategy) return;
-  botStore.activeBot.getStrategy(newStrategy);
-});
+watch(
+  strategy,
+  async (newStrategy, oldStrategy) => {
+    if (!newStrategy) {
+      strategyDetails.value = undefined;
+      return;
+    }
+    if (newStrategy === oldStrategy && strategyDetails.value?.strategy === newStrategy) {
+      return;
+    }
+
+    strategyDetails.value = undefined;
+
+    try {
+      const strategyResult = await botStore.activeBot.getStrategy(newStrategy);
+      // ensure the response corresponds to the currently selected strategy
+      if (strategy.value === newStrategy && strategyResult.strategy === newStrategy) {
+        strategyDetails.value = strategyResult;
+      }
+    } catch {
+      if (strategy.value === newStrategy) {
+        strategyDetails.value = undefined;
+      }
+    }
+  },
+  { immediate: true },
+);
 
 onMounted(() => {
   if (botStore.activeBot.strategyList.length === 0) {
@@ -32,6 +58,7 @@ onMounted(() => {
       <USelectMenu
         id="strategy-select"
         v-model="strategy"
+        :search-input="{ id: 'strategy-select-search' }"
         filter
         class="w-full"
         :items="botStore.activeBot.strategyList"
@@ -48,9 +75,10 @@ onMounted(() => {
     </div>
 
     <textarea
-      v-if="showDetails && botStore.activeBot.strategy"
-      v-model="strategyCode"
+      v-if="showDetails && strategyDetails"
+      :value="strategyCode"
       class="w-full h-full"
+      readonly
     ></textarea>
   </div>
 </template>

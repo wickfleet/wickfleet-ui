@@ -1,11 +1,16 @@
 <script setup lang="ts">
-withDefaults(
+const props = withDefaults(
   defineProps<{
-    title: string;
+    title?: string;
     size?: 'sm' | 'md' | 'lg' | 'xl';
+    class?: string;
+    unmountOnHide?: boolean;
   }>(),
   {
+    title: '',
     size: 'lg',
+    class: '',
+    unmountOnHide: true,
   },
 );
 const open = defineModel('open', {
@@ -21,6 +26,7 @@ defineOptions({
   <UCollapsible
     class="border border-neutral-300 dark:border-neutral-700 rounded-sm"
     v-model:open="open"
+    :unmount-on-hide
   >
     <UButton
       block
@@ -32,10 +38,13 @@ defineOptions({
       :ui="{
         trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
       }"
-      :label="title"
-    />
+    >
+      <slot name="title" :open="open">
+        {{ title }}
+      </slot>
+    </UButton>
     <template #content>
-      <div v-bind="$attrs">
+      <div :class="props.class">
         <slot />
       </div>
     </template>

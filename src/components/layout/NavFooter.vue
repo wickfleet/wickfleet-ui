@@ -10,7 +10,6 @@ const { hubAvailable } = useWickfleet();
     <div class="flex gap-2 justify-between px-2">
       <UButton
         v-if="hubAvailable"
-        icon-pos="top"
         variant="link"
         active-class="underline"
         class="flex flex-col gap-1"
@@ -20,7 +19,6 @@ const { hubAvailable } = useWickfleet();
       />
       <UButton
         v-if="hubAvailable"
-        icon-pos="top"
         variant="link"
         active-class="underline"
         class="flex flex-col gap-1"
@@ -30,7 +28,6 @@ const { hubAvailable } = useWickfleet();
       />
       <UButton
         v-if="!botStore.canRunBacktest"
-        icon-pos="top"
         variant="link"
         active-class="underline"
         class="flex flex-col gap-1"
@@ -40,7 +37,6 @@ const { hubAvailable } = useWickfleet();
       />
       <UButton
         v-if="hubAvailable"
-        icon-pos="top"
         variant="link"
         active-class="underline"
         class="flex flex-col gap-1"
@@ -50,7 +46,6 @@ const { hubAvailable } = useWickfleet();
       />
       <UButton
         v-if="!botStore.canRunBacktest"
-        icon-pos="top"
         variant="link"
         active-class="underline"
         class="flex flex-col gap-1"

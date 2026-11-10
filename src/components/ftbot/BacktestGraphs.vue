@@ -20,8 +20,14 @@ const { state: walletData } = useAsyncState(
 </script>
 <template>
   <div class="text-center flex flex-col gap-1">
-    <TradesLogChart :trades="trades" class="chart-equal-height" />
-    <TradeDurationChart class="chart-equal-height" :trades="trades" :show-title="true" />
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-1">
+      <TradeDurationChart class="chart-equal-height min-w-0" :trades="trades" :show-title="true" />
+      <ProfitDistributionChart
+        class="chart-equal-height min-w-0"
+        :trades="trades"
+        :show-title="true"
+      />
+    </div>
     <CumProfitChart :trades="trades" class="chart-equal-height" :show-title="true" />
     <WalletHistoryChart v-if="walletData" :wallet-data="walletData" class="chart-equal-height" />
     <MarketChangeChart
@@ -29,7 +35,7 @@ const { state: walletData } = useAsyncState(
       :market-change-data="marketChangeData"
       class="chart-equal-height"
     />
-    <ProfitDistributionChart class="chart-equal-height" :trades="trades" :show-title="true" />
+    <TradesLogChart :trades="trades" class="chart-equal-height" />
   </div>
 </template>
 <style scoped lang="css">
