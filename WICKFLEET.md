@@ -10,14 +10,18 @@ changes stay small so upstream releases merge cleanly.
 | Replay page: backtest a bot over a chosen range, summary with fees and buy-and-hold, trades | `src/pages/replay.vue` |
 | Strategies page: rules as Blockly blocks (Blockly 13.3, Apache-2.0), settings form, live hub check with readback and generated code, save | `src/pages/strategies.vue`, `src/composables/strategy*.ts` |
 | Bots page: create, edit, delete; each save is a commit to the registry | `src/pages/bots.vue` |
-| Fleet and Bots in the nav, only when a hub answers | `src/components/layout/NavBar.vue` |
+| Compare page: replay 2 or more bots over one window, metrics side by side, return curves overlaid. On a phone one card per bot. Viewers and the demo see no amounts (the hub leaves them out), the demo shows the last comparison only | `src/pages/compare.vue`, `src/components/wickfleet/EquityOverlayChart.vue`, `src/composables/wickfleetCompare.ts` |
+| Risk page: capital at stake, exposure per coin and pair, drawdown against the worst so far, stop distance, pair overlap. Viewers see no stake or exposure | `src/pages/risk.vue` |
+| Fleet, Bots, Compare and Risk in the nav, only when a hub answers | `src/components/layout/NavBar.vue` |
 
 Without a hub on the same origin the UI behaves like stock FreqUI. `WICKFLEET_HUB=http://127.0.0.1:8090 make run`
 proxies `/hub` to a local hub (`make run` in wickfleet) as an admin; `WICKFLEET_DEV_USER` and
 `WICKFLEET_DEV_GROUPS` override the identity.
 
 `make` lists the targets; CI runs `make setup lint test build` and `make setup e2e`
-(Playwright, Chromium; `e2e/wickfleet.spec.ts` mocks the hub API).
+(Playwright, Chromium; `e2e/wickfleet.spec.ts` and `e2e/wickfleetCompareRisk.spec.ts`
+mock the hub API). `SCREENSHOTS=<dir>` makes the compare and risk specs write
+`compare-<width>.png` and `risk-<width>.png` there.
 
 ## Live smoke test
 

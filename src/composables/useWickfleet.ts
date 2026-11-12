@@ -216,6 +216,146 @@ export interface ReplayList {
   jobs: ReplayJob[];
 }
 
+/** One bot's replay in a comparison. Missing fields are not in the replay result. */
+export interface CompareMetrics {
+  stake: string;
+  /** Money fields are missing for viewers: the hub leaves them out. */
+  start_balance?: number;
+  final_balance?: number;
+  profit_pct: number;
+  profit_abs?: number;
+  market_pct: number;
+  max_drawdown_pct: number;
+  sharpe?: number;
+  sortino?: number;
+  calmar?: number;
+  profit_factor?: number;
+  win_rate_pct?: number;
+  trades: number;
+  avg_duration_s?: number;
+  windows: number;
+  windows_passed: number;
+  mc_p95_drawdown_pct?: number;
+  mc_ruin_pct?: number;
+  mc_judged: boolean;
+  verdict: 'pass' | 'fail' | 'biased' | 'unknown';
+  reasons?: string[];
+}
+
+export interface EquityPoint {
+  date: string;
+  equity?: number;
+  return_pct: number;
+}
+
+export interface CompareRow {
+  bot: string;
+  owner: string;
+  exchange: string;
+  strategy: string;
+  dry: boolean;
+  replay?: string;
+  state: 'waiting' | ReplayJob['state'];
+  note?: string;
+  error?: string;
+  metrics?: CompareMetrics;
+  equity?: EquityPoint[];
+}
+
+export interface Comparison {
+  id: string;
+  owner: string;
+  from: string;
+  to: string;
+  state: 'running' | 'done' | 'failed';
+  error?: string;
+  created: string;
+  finished?: string;
+  bots: CompareRow[];
+  /** Viewer view: no balances, absolute profit or equity values. */
+  redacted?: boolean;
+}
+
+export interface CompareList {
+  enabled: boolean;
+  demo: boolean;
+  can_run: boolean;
+  max_bots: number;
+  comparisons: Comparison[];
+}
+
+/** Live risk of one bot. Money fields are missing for viewers. */
+export interface RiskBot {
+  name: string;
+  owner: string;
+  dry: boolean;
+  stake: string;
+  open_trades: number;
+  max_open_trades: number;
+  at_stake?: number;
+  value?: number;
+  drawdown_pct: number;
+  max_drawdown_pct: number;
+  of_worst_pct?: number;
+  error?: string;
+}
+
+export interface RiskPosition {
+  bot: string;
+  owner: string;
+  dry: boolean;
+  stake: string;
+  pair: string;
+  coin: string;
+  amount?: number;
+  at_stake?: number;
+  value?: number;
+  profit_pct: number;
+  stop_dist_pct?: number;
+  open_date?: string;
+}
+
+export interface RiskTotals {
+  dry: boolean;
+  stake: string;
+  bots: number;
+  open_trades: number;
+  at_stake: number;
+  value: number;
+}
+
+export interface RiskPair {
+  pair: string;
+  dry: boolean;
+  stake: string;
+  bots: string[];
+  trades: number;
+  at_stake: number;
+  value: number;
+  share_pct?: number;
+}
+
+export interface RiskCoin {
+  coin: string;
+  dry: boolean;
+  bots: string[];
+  trades: number;
+  amount: number;
+  at_stake: Record<string, number>;
+  value: Record<string, number>;
+}
+
+export interface RiskReport {
+  at: string;
+  redacted: boolean;
+  bots: RiskBot[];
+  positions: RiskPosition[];
+  totals?: RiskTotals[];
+  pairs?: RiskPair[];
+  coins?: RiskCoin[];
+  overlap: { pair: string; bots: string[]; open: string[] }[];
+}
+
 export type BotInput = Partial<
   Pick<
     HubBot,
@@ -284,6 +424,15 @@ export const hubApi = {
       body,
       headers: { 'X-Wickfleet-Request': '1' },
     }),
+  compareList: () => ofetch<CompareList>('/hub/api/compare'),
+  compare: (id: string) => ofetch<Comparison>(`/hub/api/compare/${id}`),
+  startCompare: (body: { bots?: string[]; all?: boolean; from: string; to: string }) =>
+    ofetch<{ id: string; state: string }>('/hub/api/compare', {
+      method: 'POST',
+      body,
+      headers: { 'X-Wickfleet-Request': '1' },
+    }),
+  risk: () => ofetch<RiskReport>('/hub/api/risk'),
   specs: () =>
     ofetch<{ specs: SpecSummary[]; can_create: boolean; can_draft?: boolean }>('/hub/api/specs'),
   draftStart: (sentence: string) =>

@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 SHELL := bash
 
-PNPM    ?= npx -y pnpm@12.16.1
+PNPM    ?= npx -y pnpm@12.17.0
 IMAGE   ?= wickfleet-ui
 VERSION ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
 

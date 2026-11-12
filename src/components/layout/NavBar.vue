@@ -131,6 +131,18 @@ const navItems = computed<NavItem[]>(() => [
     icon: 'i-mdi-history',
   },
   {
+    label: 'Compare',
+    to: '/compare',
+    visible: hubAvailable.value,
+    icon: 'i-mdi-compare-horizontal',
+  },
+  {
+    label: 'Risk',
+    to: '/risk',
+    visible: hubAvailable.value,
+    icon: 'i-mdi-shield-alert-outline',
+  },
+  {
     label: 'Trade',
     to: '/trade',
     visible: !botStore.canRunBacktest,

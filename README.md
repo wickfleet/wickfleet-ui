@@ -18,9 +18,12 @@ Without a hub on the same origin the UI behaves like stock FreqUI. Built with
 | Replay | backtest a bot over a chosen range: summary with fees and buy-and-hold, trades |
 | Strategies | rules as Blockly blocks, settings form, live hub check with readback and generated code |
 | Bots | create, edit, delete. Each save is a commit to the hub's registry |
+| Compare | replay 2 or more bots over one window, metrics side by side, return curves overlaid |
+| Risk | capital at stake, exposure per coin and pair, drawdown against the worst so far, stop distance, pair overlap |
 | Everything else | FreqUI as upstream ships it |
 
 Fork details and the files each change lives in: [WICKFLEET.md](WICKFLEET.md).
+Docs: [wickfleet.com/docs](https://wickfleet.com/docs/). Release notes: [docs/releases](docs/releases/).
 
 ## Build
 

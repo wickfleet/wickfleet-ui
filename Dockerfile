@@ -2,7 +2,7 @@ FROM node:26.12.1-alpine@sha256:40cd011b55415bc894e45b02fdd5a5dfde056921b7d23a64
 
 # Node 25+ ships no corepack; pnpm comes from npm at the lockfile's version.
 RUN mkdir /app \
-    && npm install -g pnpm@12.16.1
+    && npm install -g pnpm@12.17.0
 
 WORKDIR /app
 
